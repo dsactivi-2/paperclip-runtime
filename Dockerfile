@@ -1,6 +1,7 @@
 FROM node:24-bookworm-slim
 
-# Paperclip 2026.916.1 on Node 24, with the Hermes and Kimi CLIs on PATH.
+# Paperclip 2026.916.1 on Node 24, with Hermes, Kimi, and Codex on PATH.
+# Codex uses the official v2026.916.1 image method: npm global @openai/codex@latest.
 # The server uses an external DATABASE_URL and does not start a database of its own.
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -11,11 +12,13 @@ RUN apt-get update \
     python3-pip \
     tini \
   && rm -rf /var/lib/apt/lists/* \
-  && npm install --global --omit=dev paperclipai@2026.916.1 @moonshot-ai/kimi-code@2.1.1 \
+  && npm install --global --omit=dev paperclipai@2026.916.1 @moonshot-ai/kimi-code@2.1.1 @openai/codex@latest \
   && python3 -m pip install --no-cache-dir --break-system-packages hermes-agent==0.19.0 \
   && paperclipai --version \
   && command -v kimi \
   && command -v hermes \
+  && command -v codex \
+  && codex --version \
   && mkdir -p /paperclip
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
